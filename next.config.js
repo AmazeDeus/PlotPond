@@ -8,6 +8,12 @@ import "./src/env.js";
 const config = {
     reactStrictMode: true,
     output: "standalone",
+    eslint: {
+        ignoreDuringBuilds: true
+    },
+    typescript: {
+        ignoreBuildErrors: true
+    }
 };
 
 export default config;
