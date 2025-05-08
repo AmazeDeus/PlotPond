@@ -8,5 +8,5 @@ export default {
 	dbCredentials: {
 		url: env.DATABASE_URL,
 	},
-	tablesFilter: ["t3-plotpond_*"],
+	tablesFilter: ["plotpond_*"],
 } satisfies Config;
