@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { Story, Scenario } from "types"
+import type { Post } from "~/lib/mocks/types"
 
 /* Components */
 import Hero from "~/components/home/hero"
@@ -14,11 +14,11 @@ import TopStories from "~/components/home/top-stories"
 import TopScenarios from "~/components/home/top-scenarios"
 
 /* Mocked data */
-import { topScenarios, topStories } from "~/mocks/topPostData"
+import { topScenarios, topStories } from "~/lib/mocks/topPostData"
 
 export default function Home() {
-  const [activeStory, setActiveStory] = useState<Story | null>(null)
-  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null)
+  const [activeStory, setActiveStory] = useState<Post | null>(null)
+  const [activeScenario, setActiveScenario] = useState<Post | null>(null)
   const [isClient, setIsClient] = useState(false)
 
   // Hydration - only run client-side formatting after initial render

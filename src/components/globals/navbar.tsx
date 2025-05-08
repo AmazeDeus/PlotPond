@@ -108,7 +108,7 @@ export default function NavBar() {
 
                             {/* User Avatar */}
                             <Avatar className="h-8 w-8 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-200 cursor-pointer">
-                                <AvatarImage src="/placeholder-avatar.png" alt="User" />
+                                <AvatarImage src="/placeholder_avatar.png" alt="User" />
                                 <AvatarFallback className="bg-gray-800 text-purple-400">U</AvatarFallback>
                             </Avatar>
                         </div>

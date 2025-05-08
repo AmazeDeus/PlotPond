@@ -6,11 +6,11 @@ import { Button } from "~/components/ui/button"
 import ContentCard from "~/components/ui/content-card"
 
 /* Types */
-import type { Scenario } from "types"
+import type { Post } from "~/lib/mocks/types"
 
 interface TopScenariosProps {
-    scenarios: Scenario[]
-    onPreview: (scenario: Scenario) => void
+    scenarios: Post[]
+    onPreview: (scenario: Post) => void
     formatNumber: (num: number) => string
     shortenTimeAgo: (timeAgo: string) => string
 }
@@ -30,7 +30,7 @@ export default function TopScenarios({ scenarios, onPreview, formatNumber, short
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
                 {scenarios.map((scenario) => (
-                    <ContentCard<Scenario>
+                    <ContentCard
                         key={scenario.id}
                         content={scenario}
                         type="scenario"

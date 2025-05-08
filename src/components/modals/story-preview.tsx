@@ -11,13 +11,19 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
 /* Types */
-import type { Story } from "types"
+import type { Post } from "~/lib/mocks/types"
 
-export default function StoryPreview({ story, onClose }: { story: Story, onClose: () => void }) {
+export default function StoryPreview({ story, onClose }: { story: Post, onClose: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
 
   if (!story) return null
+
+  const displayedUsername = story.author.displayName ?? story.author.username
+
+  // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
+  const imageUrl = `/mocks/${story.image?.storageKey ?? 'matrix_placeholder.png'}`;
+  const profilePictureUrl = `/mocks/${story.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/90 to-indigo-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -41,7 +47,7 @@ export default function StoryPreview({ story, onClose }: { story: Story, onClose
           <div className="relative h-72">
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
             <Image
-              src={story.image || "/placeholder.svg"}
+              src={imageUrl ?? "/matrix_placeholder.png"}
               alt={story.title}
               fill
               className="object-cover"
@@ -64,7 +70,7 @@ export default function StoryPreview({ story, onClose }: { story: Story, onClose
           <div className="p-6">
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {story.tags.map((tag) => (
+              {story.tags?.map((tag) => (
                 <Badge
                   key={tag}
                   variant="secondary"
@@ -81,13 +87,13 @@ export default function StoryPreview({ story, onClose }: { story: Story, onClose
             <div className="flex items-center mb-6 p-3 bg-indigo-900/20 rounded-lg border-r-4 border-indigo-500">
               <div className="flex flex-row group">
                 <Avatar className="h-12 w-12 mr-3 ring-2 hover:cursor-pointer hover:ring-purple-600 ring-indigo-400 ring-offset-2 ring-offset-gray-900 hover:text-pink-100 duration-400 ease-in-out">
-                  <AvatarImage src={story.authorAvatar || "/placeholder.svg"} alt={story.author} />
+                  <AvatarImage src={profilePictureUrl ?? "/placeholder_avatar.png"} alt="Profile image" />
                   <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-purple-600">
-                    {story.author.substring(0, 2)}
+                    {displayedUsername.substring(0, 2)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <div className="font-medium text-white hover:group-odd:text-indigo-500 hover:cursor-pointer duration-400 ease-in-out">{story.author}</div>
+                  <div className="font-medium text-white hover:group-odd:text-indigo-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
                   <div className="text-sm text-indigo-300">{story.timeAgo}</div>
                 </div>
               </div>
@@ -113,7 +119,7 @@ export default function StoryPreview({ story, onClose }: { story: Story, onClose
             {/* Content with expandable design */}
             <div className={`relative p-4 rounded-lg bg-gradient-to-b from-black/60 to-black/30 ${!expanded ? "max-h-24 overflow-hidden" : "max-h-76 overflow-y-scroll"}`}>
               <p className="text-gray-200 leading-relaxed mb-2 first-letter:text-3xl first-letter:font-bold first-letter:text-indigo-300 first-letter:mr-1 first-letter:float-left">
-                {story.content}
+                {story.description}
               </p>
               {!expanded && (
                 <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-gray-900 to-transparent" />

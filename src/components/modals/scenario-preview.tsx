@@ -11,13 +11,19 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
 /* Types */
-import type { Scenario } from "types"
+import type { Post } from "~/lib/mocks/types"
 
-export default function ScenarioPreview({ scenario, onClose }: { scenario: Scenario, onClose: () => void }) {
+export default function ScenarioPreview({ scenario, onClose }: { scenario: Post, onClose: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
 
   if (!scenario) return null
+
+  const displayedUsername = scenario.author.displayName ?? scenario.author.username
+
+  // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
+  const imageUrl = `/mocks/${scenario.image?.storageKey ?? 'matrix_placeholder.png'}`;
+  const profilePictureUrl = `/mocks/${scenario.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/90 to-gray-900/95 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-hidden">
@@ -51,7 +57,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Scena
           <div className="relative h-72">
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10" />
             <Image
-              src={scenario.image || "/placeholder.svg"}
+              src={imageUrl ?? "/matrix_placeholder.png"}
               alt={scenario.title}
               fill
               className="object-cover"
@@ -61,7 +67,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Scena
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                {scenario.tags.map((tag) => (
+                {scenario.tags?.map((tag) => (
                   <Badge
                     key={tag}
                     variant="secondary"
@@ -81,13 +87,13 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Scena
             <div className="flex items-center mb-6 bg-gray-800/50 p-3 rounded-lg border-l-4 border-pink-500">
               <div className="flex flex-row group">
                 <Avatar className="h-12 w-12 mr-3 ring-2 hover:cursor-pointer hover:ring-purple-600 ring-pink-400 ring-offset-2 ring-offset-gray-900 hover:text-pink-100 duration-400 ease-in-out">
-                  <AvatarImage src={scenario.creatorAvatar || "/placeholder.svg"} alt={scenario.creator} />
+                  <AvatarImage src={profilePictureUrl ?? "/placeholder_avatar.png"} alt="Profile image" />
                   <AvatarFallback className="bg-gradient-to-br from-pink-600 to-purple-600">
-                    {scenario.creator.substring(0, 2)}
+                    {displayedUsername.substring(0, 2)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <div className="font-medium text-white hover:group-odd:text-pink-500 hover:cursor-pointer duration-400 ease-in-out">{scenario.creator}</div>
+                  <div className="font-medium text-white hover:group-odd:text-pink-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
                   <div className="text-sm text-pink-300">{scenario.timeAgo}</div>
                 </div>
               </div>
@@ -110,7 +116,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Scena
 
             {/* Content with expandable design */}
             <div className={`relative p-4 rounded-lg bg-gradient-to-b from-black/60 to-black/30 ${!expanded ? "max-h-24 overflow-hidden" : "max-h-76 overflow-y-scroll"}`}>
-              <p className="text-gray-200 leading-relaxed mb-2">{scenario.content}</p>
+              <p className="text-gray-200 leading-relaxed mb-2">{scenario.description}</p>
               {!expanded && <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-gray-900 to-transparent" />}
             </div>
 
@@ -136,11 +142,11 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Scena
               <div className="flex gap-6 text-sm">
                 <div className="flex items-center gap-1 text-pink-300">
                   <Star className="h-4 w-4 fill-pink-400 text-pink-400" />
-                  <span>{scenario.stars.toLocaleString()} stars</span>
+                  <span>{scenario.likes.toLocaleString()} stars</span>
                 </div>
                 <div className="flex items-center gap-1 text-pink-300">
                   <Play className="h-4 w-4 fill-pink-400 text-pink-400" />
-                  <span>{scenario.plays.toLocaleString()} plays</span>
+                  <span>{scenario.views.toLocaleString()} plays</span>
                 </div>
                 <Button
                   variant="ghost"

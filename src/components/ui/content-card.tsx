@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { ChevronRight, PlayCircle, ThumbsUp, Eye, Star, Clock } from "lucide-react"
+import { ChevronRight, ThumbsUp, Eye, Star, Clock } from "lucide-react"
 
 /* Components */
 import { Card, CardFooter } from "~/components/ui/card"
@@ -8,29 +8,37 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
 /* Types */
-import type { Story, Scenario } from "types"
+import type { Post } from "~/lib/mocks/types"
 
-interface ContentCardProps<T extends Story | Scenario> {
-    content: T
-    type: T extends Story ? 'story' : 'scenario'
-    onPreview: (content: T) => void
+interface ContentCardProps {
+    content: Post
+    type: 'story' | 'scenario'
+    onPreview: (content: Post) => void
     formatNumber: (num: number) => string
     shortenTimeAgo: (timeAgo: string) => string
 }
 
-export default function ContentCard<T extends Story | Scenario>({ content, type, onPreview, formatNumber, shortenTimeAgo }: ContentCardProps<T>) {
+export default function ContentCard({ content, type, onPreview, formatNumber, shortenTimeAgo }: ContentCardProps) {
     const isStory = type === 'story'
     const accentColor = isStory ? 'purple' : 'pink'
+
+    const displayedUsername = content.author.displayName ?? content.author.username
+    const postExcerpt = content.excerpt ?? `${displayedUsername} worked hard on this ${type}. Greatness ahead! We think you might enjoy it! o(*￣︶￣*)o`
+
+    // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
+    const imageUrl = `/mocks/${content.image?.storageKey ?? 'matrix_placeholder.png'}`;
+    const profilePictureUrl = `/mocks/${content.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
+
     const stats = isStory
         ? {
-            likes: (content as Story).likes ?? 0,
-            views: (content as Story).views ?? 0,
-            timeAgo: (content as Story).timeAgo
+            likes: content.likes ?? 0,
+            views: content.views ?? 0,
+            timeAgo: content.timeAgo
         }
         : {
-            stars: (content as Scenario).stars ?? 0,
-            plays: (content as Scenario).plays ?? 0,
-            timeAgo: (content as Scenario).timeAgo
+            stars: content.likes ?? 0,
+            plays: content.views ?? 0,
+            timeAgo: content.timeAgo
         }
 
     const renderStats = () => {
@@ -66,7 +74,7 @@ export default function ContentCard<T extends Story | Scenario>({ content, type,
         >
             <div className="relative will-change-transform transform-gpu overflow-clip w-full aspect-[3/4] sm:aspect-video md:aspect-[3/4] lg:aspect-[4/5] xl:aspect-[3/4]">
                 <Image
-                    src={content.image || "/matrix_placeholder.png"}
+                    src={imageUrl ?? "/matrix_placeholder.png"}
                     alt={content.title}
                     fill
                     className="will-change-transform transform-gpu object-cover z-10 group-hover:scale-105 transition-transform duration-500 ease-in-out"
@@ -74,7 +82,7 @@ export default function ContentCard<T extends Story | Scenario>({ content, type,
                 <div className="absolute z-20 inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
 
                 <div className="absolute top-3 right-3 flex gap-1.5 z-10">
-                    {content.tags.slice(0, 2).map((tag) => (
+                    {content.tags?.slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="outline" className="border-white/30 bg-black/40 backdrop-blur-sm text-white text-[10px] px-2 py-0.5">
                             {tag}
                         </Badge>
@@ -87,23 +95,34 @@ export default function ContentCard<T extends Story | Scenario>({ content, type,
                     </h3>
                     <div className="flex items-center">
                         <Avatar className={`h-6 w-6 mr-2 border-2 border-transparent group-hover:border-${accentColor}-400/70 transition-all duration-200`}>
-                            <AvatarImage src={isStory ? (content as Story).authorAvatar : (content as Scenario).creatorAvatar || "/placeholder-avatar.png"} alt={isStory ? (content as Story).author : (content as Scenario).creator} />
+                            <AvatarImage src={profilePictureUrl ?? "/placeholder_avatar.png"} alt="Profile image" />
                             <AvatarFallback className="text-xs bg-gray-700">
-                                {(isStory ? (content as Story).author : (content as Scenario).creator).substring(0, 1)}
+                                {displayedUsername.substring(0, 1)}
                             </AvatarFallback>
                         </Avatar>
                         <span className="text-xs text-gray-300 group-hover:text-gray-100 transition-colors duration-200">
-                            {isStory ? (content as Story).author : (content as Scenario).creator}
+                            {displayedUsername}
                         </span>
                     </div>
                 </div>
-                <button
-                    aria-label={`Preview ${type}: ${content.title}`}
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 bg-black/40 cursor-pointer z-20"
+
+                {/* Subtle excerpt overlay on hover */}
+                <div
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 bg-gradient-to-b from-black/60 via-black/70 to-black/90 cursor-pointer z-30"
                     onClick={() => onPreview(content)}
                 >
-                    <PlayCircle className="h-16 w-16 text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
-                </button>
+                    <div className="max-w-[90%] text-center px-4 py-3 transform transition-all duration-300 ease-out translate-y-2 group-hover:translate-y-0">
+                        <p className={`text-white font-normal text-sm md:text-base italic leading-relaxed line-clamp-4 text-opacity-90 drop-shadow-md`}>
+                            <span className={`text-${accentColor}-300`}>❝ </span>{postExcerpt}<span className={`text-${accentColor}-300`}> ❞</span>
+                        </p>
+                        <div className={`w-1/3 h-px bg-gradient-to-r from-transparent via-${accentColor}-400/50 to-transparent mt-3 mb-2 mx-auto`}></div>
+                        <div
+                            className={`text-${accentColor}-200 hover:text-${accentColor}-100 opacity-40 text-xs font-medium transition-colors duration-200`}
+                        >
+                            - - - - - - - - - - -
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <CardFooter className="z-20 p-3 bg-inherit border-t border-gray-700/30 flex justify-between items-center mt-auto">
@@ -125,4 +144,4 @@ export default function ContentCard<T extends Story | Scenario>({ content, type,
             </CardFooter>
         </Card>
     )
-} 
+}

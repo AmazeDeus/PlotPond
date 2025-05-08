@@ -6,11 +6,11 @@ import { Button } from "~/components/ui/button"
 import ContentCard from "~/components/ui/content-card"
 
 /* Types */
-import type { Story } from "types"
+import type { Post } from "~/lib/mocks/types"
 
 interface TopStoriesProps {
-    stories: Story[]
-    onPreview: (story: Story) => void
+    stories: Post[]
+    onPreview: (story: Post) => void
     formatNumber: (num: number) => string
     shortenTimeAgo: (timeAgo: string) => string
 }
@@ -30,7 +30,7 @@ export default function TopStories({ stories, onPreview, formatNumber, shortenTi
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
                 {stories.map((story) => (
-                    <ContentCard<Story>
+                    <ContentCard
                         key={story.id}
                         content={story}
                         type="story"
