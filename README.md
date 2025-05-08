@@ -120,7 +120,8 @@ docker run -p 3000:3000 -e DATABASE_URL="database_url_goes_here" plotpond
 
 ### Planned Features
 - [ ] Post view route
-- [ ] File uploading system
+- [ ] Post creation system
+- [ ] File uploading system (text files for posts)
 - [ ] User bookmark/save functionality
 - [ ] Post likes/views tracking
 - [ ] Scenario download functionality
@@ -132,6 +133,7 @@ docker run -p 3000:3000 -e DATABASE_URL="database_url_goes_here" plotpond
 - [ ] Private messaging
 - [ ] Post sharing
 - [ ] World info/lore crafting system
+- [ ] File uploading system (json files for lore system)
 - [ ] Resources route for downloadable content (?)
 
 ## Deployment
