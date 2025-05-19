@@ -11,9 +11,14 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
 /* Types */
-import type { Post } from "~/lib/mocks/types"
+import type { GetTopPostsWithAuthor } from "~/server/db/queries/posts"
 
-export default function ScenarioPreview({ scenario, onClose }: { scenario: Post, onClose: () => void }) {
+interface ScenarioPreviewProps {
+  scenario: GetTopPostsWithAuthor[number]
+  onClose: () => void
+}
+
+export default function ScenarioPreview({ scenario, onClose }: ScenarioPreviewProps) {
   const [expanded, setExpanded] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
 
@@ -22,8 +27,13 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
   const displayedUsername = scenario.author.displayName ?? scenario.author.username
 
   // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
-  const imageUrl = `/mocks/${scenario.image?.storageKey ?? 'matrix_placeholder.png'}`;
-  const profilePictureUrl = `/mocks/${scenario.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
+  const imageUrl = process.env.NODE_ENV === 'development'
+    ? `/mocks/posts/${scenario.featuredImage?.name ?? "matrix_placeholder"}.png`
+    : `/${scenario.featuredImage?.storageKey ?? 'matrix_placeholder.png'}`
+
+  const profilePictureUrl = process.env.NODE_ENV === 'development'
+    ? `/mocks/profile/${scenario.author.profilePicture?.name ?? "placeholder-avatar"}.png`
+    : `/${scenario.author.profilePicture?.storageKey ?? "placeholder-avatar.png"}`
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/90 to-gray-900/95 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-hidden">
@@ -39,7 +49,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
           <span className="sr-only">Close</span>
         </Button>
 
-        {/* Header with glass effect */}
+        {/* Header */}
         <div className="sticky top-0 backdrop-blur-md bg-black/30 p-4 border-b border-pink-500/30 flex justify-between items-center z-10">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-pink-500 animate-pulse"></div>
@@ -50,10 +60,10 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
         </div>
 
         {/* Side decorative element */}
-        <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-pink-600"></div>
+        <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-pink-600" />
 
         <div className="p-0">
-          {/* Hero image with gradient overlay */}
+          {/* Hero image */}
           <div className="relative h-72">
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10" />
             <Image
@@ -83,7 +93,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
           </div>
 
           <div className="p-6 pt-4">
-            {/* Author info with highlight */}
+            {/* Author info */}
             <div className="flex items-center mb-6 bg-gray-800/50 p-3 rounded-lg border-l-4 border-pink-500">
               <div className="flex flex-row group">
                 <Avatar className="h-12 w-12 mr-3 ring-2 hover:cursor-pointer hover:ring-purple-600 ring-pink-400 ring-offset-2 ring-offset-gray-900 hover:text-pink-100 duration-400 ease-in-out">
@@ -94,7 +104,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
                 </Avatar>
                 <div className="flex flex-col">
                   <div className="font-medium text-white hover:group-odd:text-pink-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
-                  <div className="text-sm text-pink-300">{scenario.timeAgo}</div>
+                  <div className="text-sm text-pink-300">{scenario.timeAgoUpdated}</div>
                 </div>
               </div>
               <Button
@@ -114,7 +124,7 @@ export default function ScenarioPreview({ scenario, onClose }: { scenario: Post,
               </Button>
             </div>
 
-            {/* Content with expandable design */}
+            {/* Content */}
             <div className={`relative p-4 rounded-lg bg-gradient-to-b from-black/60 to-black/30 ${!expanded ? "max-h-24 overflow-hidden" : "max-h-76 overflow-y-scroll"}`}>
               <p className="text-gray-200 leading-relaxed mb-2">{scenario.description}</p>
               {!expanded && <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-gray-900 to-transparent" />}

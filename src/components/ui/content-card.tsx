@@ -1,44 +1,43 @@
-import Image from "next/image"
-import { ChevronRight, ThumbsUp, Eye, Star, Clock } from "lucide-react"
+import Image from "next/image";
+import { ChevronRight, ThumbsUp, Eye, Star, Clock } from "lucide-react";
 
 /* Components */
-import { Card, CardFooter } from "~/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
+import { Card, CardFooter } from "~/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 
 /* Types */
-import type { Post } from "~/lib/mocks/types"
+import type { GetTopPostsWithAuthor } from "~/server/db/queries/posts";
 
 interface ContentCardProps {
-    content: Post
-    type: 'story' | 'scenario'
-    onPreview: (content: Post) => void
-    formatNumber: (num: number) => string
-    shortenTimeAgo: (timeAgo: string) => string
+    content: GetTopPostsWithAuthor[number];
+    author: GetTopPostsWithAuthor[number]['author'];
+    type: 'story' | 'scenario';
+    onOpenPreview: () => void;
 }
 
-export default function ContentCard({ content, type, onPreview, formatNumber, shortenTimeAgo }: ContentCardProps) {
+export default function ContentCard({ content, author, type, onOpenPreview }: ContentCardProps) {
     const isStory = type === 'story'
     const accentColor = isStory ? 'purple' : 'pink'
 
-    const displayedUsername = content.author.displayName ?? content.author.username
-    const postExcerpt = content.excerpt ?? `${displayedUsername} worked hard on this ${type}. Greatness ahead! We think you might enjoy it! o(*￣︶￣*)o`
+    const displayedUsername = author.displayName ?? author.username
+    const postExcerpt = content.excerpt ?? `${displayedUsername} worked hard on this ${type}. Check it out! We think you might enjoy it! o(*￣︶￣*)o`
 
     // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
-    const imageUrl = `/mocks/${content.image?.storageKey ?? 'matrix_placeholder.png'}`;
-    const profilePictureUrl = `/mocks/${content.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
+    const imageUrl = process.env.NODE_ENV === 'development' ? `/mocks/posts/${content.featuredImage?.name}.png` : `/${content.featuredImage?.storageKey ?? 'matrix_placeholder.png'}`
+    const profilePictureUrl = process.env.NODE_ENV === 'development' ? `/mocks/users/${content.author.profilePicture?.name}.png` : `/${content.author.profilePicture?.storageKey ?? 'placeholder_avatar.png'}` // Note: "/mocks/users/" doesn't exist
 
     const stats = isStory
         ? {
             likes: content.likes ?? 0,
             views: content.views ?? 0,
-            timeAgo: content.timeAgo
+            timeAgo: content.timeAgoUpdated
         }
         : {
             stars: content.likes ?? 0,
             plays: content.views ?? 0,
-            timeAgo: content.timeAgo
+            timeAgo: content.timeAgoUpdated
         }
 
     const renderStats = () => {
@@ -46,11 +45,11 @@ export default function ContentCard({ content, type, onPreview, formatNumber, sh
             const storyStats = stats as { likes: number; views: number; timeAgo: string }
             return (
                 <>
-                    <span className="flex items-center" title={`${formatNumber(storyStats.likes)} likes`}>
-                        <ThumbsUp className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {formatNumber(storyStats.likes)}
+                    <span className="flex items-center" title={`${storyStats.likes.toLocaleString()} likes`}>
+                        <ThumbsUp className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {storyStats.likes.toLocaleString()}
                     </span>
-                    <span className="flex items-center" title={`${formatNumber(storyStats.views)} views`}>
-                        <Eye className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {formatNumber(storyStats.views)}
+                    <span className="flex items-center" title={`${storyStats.views.toLocaleString()} views`}>
+                        <Eye className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {storyStats.views.toLocaleString()}
                     </span>
                 </>
             )
@@ -58,11 +57,11 @@ export default function ContentCard({ content, type, onPreview, formatNumber, sh
         const scenarioStats = stats as { stars: number; plays: number; timeAgo: string }
         return (
             <>
-                <span className="flex items-center" title={`${formatNumber(scenarioStats.stars)} stars`}>
-                    <Star className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {formatNumber(scenarioStats.stars)}
+                <span className="flex items-center" title={`${scenarioStats.stars.toLocaleString()} stars`}>
+                    <Star className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {scenarioStats.stars.toLocaleString()}
                 </span>
-                <span className="flex items-center" title={`${formatNumber(scenarioStats.plays)} plays`}>
-                    <Eye className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {formatNumber(scenarioStats.plays)}
+                <span className="flex items-center" title={`${scenarioStats.plays.toLocaleString()} plays`}>
+                    <Eye className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {scenarioStats.plays.toLocaleString()}
                 </span>
             </>
         )
@@ -109,7 +108,7 @@ export default function ContentCard({ content, type, onPreview, formatNumber, sh
                 {/* Subtle excerpt overlay on hover */}
                 <div
                     className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 bg-gradient-to-b from-black/60 via-black/70 to-black/90 cursor-pointer z-30"
-                    onClick={() => onPreview(content)}
+                    onClick={onOpenPreview}
                 >
                     <div className="max-w-[90%] text-center px-4 py-3 transform transition-all duration-300 ease-out translate-y-2 group-hover:translate-y-0">
                         <p className={`text-white font-normal text-sm md:text-base italic leading-relaxed line-clamp-4 text-opacity-90 drop-shadow-md`}>
@@ -129,7 +128,7 @@ export default function ContentCard({ content, type, onPreview, formatNumber, sh
                 <div className="flex items-center text-gray-400 text-xs space-x-3">
                     {renderStats()}
                     <span className="flex items-center" title={stats.timeAgo}>
-                        <Clock className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {shortenTimeAgo(stats.timeAgo)}
+                        <Clock className={`h-3.5 w-3.5 mr-1 text-${accentColor}-400/80`} /> {stats.timeAgo}
                     </span>
                 </div>
                 <Button
@@ -137,7 +136,7 @@ export default function ContentCard({ content, type, onPreview, formatNumber, sh
                     size="sm"
                     aria-label={`View details for ${content.title}`}
                     className={`will-change-transform transform-gpu text-${accentColor}-400 hover:cursor-pointer hover:text-${accentColor}-300 p-0 h-auto text-xs font-semibold`}
-                    onClick={() => onPreview(content)}
+                    onClick={onOpenPreview}
                 >
                     Details <ChevronRight className="ml-0.5 h-3.5 w-3.5" />
                 </Button>

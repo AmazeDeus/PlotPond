@@ -11,9 +11,14 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
 /* Types */
-import type { Post } from "~/lib/mocks/types"
+import type { GetTopPostsWithAuthor } from "~/server/db/queries/posts"
 
-export default function StoryPreview({ story, onClose }: { story: Post, onClose: () => void }) {
+interface StoryPreviewProps {
+  story: GetTopPostsWithAuthor[number]
+  onClose: () => void
+}
+
+export default function StoryPreview({ story, onClose }: StoryPreviewProps) {
   const [expanded, setExpanded] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
 
@@ -22,8 +27,13 @@ export default function StoryPreview({ story, onClose }: { story: Post, onClose:
   const displayedUsername = story.author.displayName ?? story.author.username
 
   // `https://future-cdn-or-s3-bucket-url.com/${content.image?.storageKey ?? placeholder.png}`;
-  const imageUrl = `/mocks/${story.image?.storageKey ?? 'matrix_placeholder.png'}`;
-  const profilePictureUrl = `/mocks/${story.author.profilePictureUrl ?? "/placeholder-avatar.png"}`
+  const imageUrl = process.env.NODE_ENV === 'development'
+    ? `/mocks/posts/${story.featuredImage?.name ?? "matrix_placeholder"}.png`
+    : `/${story.featuredImage?.storageKey ?? 'matrix_placeholder.png'}`
+
+  const profilePictureUrl = process.env.NODE_ENV === 'development'
+    ? `/mocks/profile/${story.author.profilePicture?.name ?? "placeholder-avatar"}.png`
+    : `/${story.author.profilePicture?.storageKey ?? "placeholder-avatar.png"}`
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-black/90 to-indigo-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -41,9 +51,9 @@ export default function StoryPreview({ story, onClose }: { story: Post, onClose:
 
         <div>
           {/* Side decorative element */}
-          <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-indigo-600"></div>
+          <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-indigo-600" />
 
-          {/* Hero image with interactive elements overlay */}
+          {/* Hero image */}
           <div className="relative h-72">
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
             <Image
@@ -94,7 +104,7 @@ export default function StoryPreview({ story, onClose }: { story: Post, onClose:
                 </Avatar>
                 <div className="flex flex-col">
                   <div className="font-medium text-white hover:group-odd:text-indigo-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
-                  <div className="text-sm text-indigo-300">{story.timeAgo}</div>
+                  <div className="text-sm text-indigo-300">{story.timeAgoUpdated}</div>
                 </div>
               </div>
               <div className="ml-auto flex gap-2">
@@ -116,7 +126,7 @@ export default function StoryPreview({ story, onClose }: { story: Post, onClose:
               </div>
             </div>
 
-            {/* Content with expandable design */}
+            {/* Content */}
             <div className={`relative p-4 rounded-lg bg-gradient-to-b from-black/60 to-black/30 ${!expanded ? "max-h-24 overflow-hidden" : "max-h-76 overflow-y-scroll"}`}>
               <p className="text-gray-200 leading-relaxed mb-2 first-letter:text-3xl first-letter:font-bold first-letter:text-indigo-300 first-letter:mr-1 first-letter:float-left">
                 {story.description}

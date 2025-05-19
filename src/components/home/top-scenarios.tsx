@@ -1,21 +1,19 @@
-import Link from "next/link"
-import { ArrowRight, Zap } from "lucide-react"
+import Link from "next/link";
+import { ArrowRight, Zap } from "lucide-react";
 
 /* Components */
-import { Button } from "~/components/ui/button"
-import ContentCard from "~/components/ui/content-card"
+import { Button } from "~/components/ui/button";
+import ContentCard from "~/components/ui/content-card"; //
 
 /* Types */
-import type { Post } from "~/lib/mocks/types"
+import type { GetTopPostsWithAuthor } from "~/server/db/queries/posts";
 
 interface TopScenariosProps {
-    scenarios: Post[]
-    onPreview: (scenario: Post) => void
-    formatNumber: (num: number) => string
-    shortenTimeAgo: (timeAgo: string) => string
+    scenarios: GetTopPostsWithAuthor;
+    onScenarioSelect: (scenario: GetTopPostsWithAuthor[number]) => void;
 }
 
-export default function TopScenarios({ scenarios, onPreview, formatNumber, shortenTimeAgo }: TopScenariosProps) {
+export default function TopScenarios({ scenarios, onScenarioSelect }: TopScenariosProps) {
     return (
         <section className="py-16 container mx-auto px-4 bg-gradient-to-b from-gray-950 to-black rounded-xl my-10">
             <div className="text-center mb-12">
@@ -29,14 +27,13 @@ export default function TopScenarios({ scenarios, onPreview, formatNumber, short
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
-                {scenarios.map((scenario) => (
+                {scenarios.map(scenario => (
                     <ContentCard
                         key={scenario.id}
                         content={scenario}
+                        author={scenario.author}
                         type="scenario"
-                        onPreview={onPreview}
-                        formatNumber={formatNumber}
-                        shortenTimeAgo={shortenTimeAgo}
+                        onOpenPreview={() => onScenarioSelect(scenario)}
                     />
                 ))}
             </div>

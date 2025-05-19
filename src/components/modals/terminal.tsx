@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { Terminal as TerminalIcon, X } from "lucide-react"
 
