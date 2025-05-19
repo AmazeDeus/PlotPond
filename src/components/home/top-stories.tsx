@@ -1,21 +1,19 @@
-import Link from "next/link"
-import { ArrowRight, BookOpen } from "lucide-react"
+import Link from "next/link";
+import { ArrowRight, BookOpen } from "lucide-react";
 
 /* Components */
-import { Button } from "~/components/ui/button"
-import ContentCard from "~/components/ui/content-card"
+import { Button } from "~/components/ui/button";
+import ContentCard from "~/components/ui/content-card"; //
 
 /* Types */
-import type { Post } from "~/lib/mocks/types"
+import type { GetTopPostsWithAuthor } from "~/server/db/queries/posts";
 
 interface TopStoriesProps {
-    stories: Post[]
-    onPreview: (story: Post) => void
-    formatNumber: (num: number) => string
-    shortenTimeAgo: (timeAgo: string) => string
+    stories: GetTopPostsWithAuthor;
+    onStorySelect: (story: GetTopPostsWithAuthor[number]) => void;
 }
 
-export default function TopStories({ stories, onPreview, formatNumber, shortenTimeAgo }: TopStoriesProps) {
+export default function TopStories({ stories, onStorySelect }: TopStoriesProps) {
     return (
         <section className="py-16 container mx-auto px-4">
             <div className="text-center mb-12">
@@ -29,14 +27,13 @@ export default function TopStories({ stories, onPreview, formatNumber, shortenTi
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
-                {stories.map((story) => (
+                {stories.map(story => (
                     <ContentCard
                         key={story.id}
                         content={story}
+                        author={story.author}
                         type="story"
-                        onPreview={onPreview}
-                        formatNumber={formatNumber}
-                        shortenTimeAgo={shortenTimeAgo}
+                        onOpenPreview={() => onStorySelect(story)} // Pass the handler
                     />
                 ))}
             </div>
