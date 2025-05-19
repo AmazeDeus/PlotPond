@@ -8,7 +8,7 @@ import InteractiveHomeContent from "~/components/home/interactive-home-content";
 /* Queries */
 import { getCachedTopPostsWithAuthor } from "~/server/db/queries/posts";
 
-export const revalidate = 60 * 5;
+export let revalidate = 3600;
 
 export default async function Home() {
   const topStories = await getCachedTopPostsWithAuthor({ limit: 5, type: 'story' });

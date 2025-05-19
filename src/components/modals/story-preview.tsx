@@ -104,7 +104,7 @@ export default function StoryPreview({ story, onClose }: StoryPreviewProps) {
                 </Avatar>
                 <div className="flex flex-col">
                   <div className="font-medium text-white hover:group-odd:text-indigo-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
-                  <div className="text-sm text-indigo-300">{story.timeAgo}</div>
+                  <div className="text-sm text-indigo-300">{story.timeAgoUpdated}</div>
                 </div>
               </div>
               <div className="ml-auto flex gap-2">

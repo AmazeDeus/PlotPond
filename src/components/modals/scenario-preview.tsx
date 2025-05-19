@@ -104,7 +104,7 @@ export default function ScenarioPreview({ scenario, onClose }: ScenarioPreviewPr
                 </Avatar>
                 <div className="flex flex-col">
                   <div className="font-medium text-white hover:group-odd:text-pink-500 hover:cursor-pointer duration-400 ease-in-out">{displayedUsername}</div>
-                  <div className="text-sm text-pink-300">{scenario.timeAgo}</div>
+                  <div className="text-sm text-pink-300">{scenario.timeAgoUpdated}</div>
                 </div>
               </div>
               <Button
