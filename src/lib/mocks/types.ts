@@ -1,27 +1,28 @@
+import type { Post as DbPost } from '~/server/db/schema/posts';
+
 export interface Image {
-    id: string;
-    name?: string;
+    id: number;
+    name: string;
     altText?: string;
     storageKey: string; // The key or path to the image in the cloud storage
-                        // Can end up being modified into `url: string;` depending on how the URLs end up being constructed
+    // Can end up being modified into `url: string;` depending on how the URLs end up being constructed
     mimeType: string;
     width: number;
     height: number;
     size: number;
-    parentId: string;
+    parentId: number;
     parentType: "post" | "user";
     uploadedAt: Date;
 }
 
 export interface User {
-    id: string;
+    id: number;
     username: string;
     displayName?: string | null;
     email: string;
     bio?: string | null;
-    profilePictureUrl?: string | null; // Or derived from an Image relation
+    profilePicture?: Image | null;
     emailVerified: boolean;
-    // Will probably handle internally:
     // emailVerificationToken?: string | null;
     // emailVerificationTokenExpiresAt?: Date | null;
     createdAt: Date;
@@ -45,7 +46,7 @@ export interface User {
     // comments?: Comment[];
 }
 
-// Define Tag type to resolve lint error and for Post.tags
+// Ambigous type for now.
 export type Tag = string;
 
 export enum ContentRating {
@@ -101,16 +102,21 @@ export interface RichTextElement {
 export type RichTextContent = RichTextElement[];
 
 export type Post = {
-    id: string
+    id: number
+    slug: string
+    type: 'story' | 'scenario'
     rating: ContentRating
     title: string
-    author: User
+    author: User // In prod will only populate the id
     excerpt?: string
     description: string
-    image?: Image
+    image?: Image // In prod will only populate the image id
     likes: number
     views: number
+    bookmarks: number
     timeAgo: string
     tags?: Tag[]
-    content: RichTextContent
+    content: DbPost['content']
+    createdAt: Date
+    updatedAt: Date
 }
